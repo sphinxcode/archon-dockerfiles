@@ -9,8 +9,9 @@ RUN pip install --no-cache-dir uv
 # Copy pyproject.toml for dependency installation
 COPY pyproject.toml .
 
-# Install only mcp dependencies using uv
+# Install only mcp dependencies using uv (plus FastAPI and uvicorn for health server)
 RUN uv pip install --system --group mcp
+RUN uv pip install --system fastapi uvicorn
 
 # Create minimal directory structure
 RUN mkdir -p src/mcp_server/features/projects src/mcp_server/features/tasks src/mcp_server/features/documents src/server/services src/server/config
@@ -38,5 +39,5 @@ ARG ARCHON_MCP_PORT=8051
 ENV ARCHON_MCP_PORT=${ARCHON_MCP_PORT}
 EXPOSE ${ARCHON_MCP_PORT}
 
-# Run the MCP server
-CMD ["python", "-m", "src.mcp_server.mcp_server"]
+# Run the combined MCP server (SSE + health endpoints)
+CMD ["python", "-m", "src.mcp_server.run_mcp"]
