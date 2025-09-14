@@ -79,6 +79,20 @@ if not mcp_port:
     )
 server_port = int(mcp_port)
 
+# Get transport type from environment (default to sse for compatibility)
+transport_type = os.getenv("MCP_TRANSPORT", "sse").lower()
+if transport_type not in ["sse", "streamable-http", "http"]:
+    logger.warning(f"Unknown transport type '{transport_type}', defaulting to 'sse'")
+    transport_type = "sse"
+
+# Normalize transport type
+if transport_type == "http":
+    transport_type = "streamable-http"
+
+logger.info(f"🚀 MCP Server Configuration:")
+logger.info(f"   Transport: {transport_type}")
+logger.info(f"   Port: {server_port}")
+
 
 @dataclass
 class ArchonContext:
@@ -505,13 +519,19 @@ def main():
         setup_logfire(service_name="archon-mcp-server")
 
         logger.info("🚀 Starting Archon MCP Server")
-        logger.info("   Mode: Streamable HTTP")
-        logger.info(f"   URL: http://{server_host}:{server_port}/mcp")
+        logger.info(f"   Mode: {transport_type.upper()}")
+        
+        # Different URLs for different transports
+        if transport_type == "sse":
+            logger.info(f"   URL: http://{server_host}:{server_port}/sse")
+        else:
+            logger.info(f"   URL: http://{server_host}:{server_port}/mcp")
 
         mcp_logger.info("🔥 Logfire initialized for MCP server")
-        mcp_logger.info(f"🌟 Starting MCP server - host={server_host}, port={server_port}")
+        mcp_logger.info(f"🌟 Starting MCP server - host={server_host}, port={server_port}, transport={transport_type}")
 
-        mcp.run(transport="streamable-http")
+        # Run with the configured transport type
+        mcp.run(transport=transport_type)
 
     except Exception as e:
         mcp_logger.error(f"💥 Fatal error in main - error={str(e)}, error_type={type(e).__name__}")
