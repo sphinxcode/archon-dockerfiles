@@ -56,6 +56,7 @@ server = [
     "slowapi>=0.1.9",
     # Core utilities
     "httpx>=0.24.0",
+    "aiohttp>=3.9.0",
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
     "docker>=6.1.0",
@@ -124,6 +125,7 @@ all = [
     "structlog>=23.1.0",
     # Shared utilities
     "httpx>=0.24.0",
+    "aiohttp>=3.9.0",
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
     # Test dependencies
